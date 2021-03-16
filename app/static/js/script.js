@@ -58,7 +58,7 @@ function draw_mapper_param_sliders(){
     console.log("draw sliders")
     let intervals = [10, 20, 30, 40, 50];
     let overlaps = [0.25, 0.30, 0.35];
-
+    let numbers = [10, 20, 30, 40, 50];
     let width = $(d3.select("#workspace-load_result").select(".block_body-inner").node()).width();
     let height = 30;
     let margin = {"left":5, "top":15, "right":10, "bottom":15};
@@ -72,6 +72,10 @@ function draw_mapper_param_sliders(){
                             // .domain([0, Math.max(...overlaps)+0.1])
                             .range([margin.left, width-margin.right]);
 
+    let number_scale = d3.scaleLinear()
+                            // .domain([0, Math.max(Math.max(...intervals),100)])
+                            .domain([0, Math.max(...numbers)+10])
+                            .range([margin.left, width-margin.right]);
 
     let interval_svg = d3.select("#mapper_interval_sliders")
         .attr("width", width)
@@ -206,6 +210,14 @@ function draw_mapper_param_sliders(){
         .attr("fill", "white")
         .attr("stroke", "grey")
         .attr("stroke-width", 2);
+ 
+
+    let number_svg = d3.select("#mapper_number_sliders")
+        .attr("width", width)
+        .attr("height", height);
+    // number
+    
+
 
 
 }

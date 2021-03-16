@@ -16,7 +16,7 @@ class Graph{
         console.log(this.links)
         console.log(this.col_keys)
         console.log(this.connected_components)
-        this.clear_mapper();
+        //this.clear_mapper();
         // init graph container
         this.width = $(d3.select(".viewer-graph__graph").node()).width();
         this.height = Math.max($(d3.select(".viewer-graph__graph").node()).height(), 650);

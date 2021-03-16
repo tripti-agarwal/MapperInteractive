@@ -416,9 +416,9 @@ class DataLoader{
     }
 
     edit_filtering_param(){
-        let filtering_param_ranges_limit = {"interval1":{"left":1, "right":100}, "overlap1":{"left":0, "right":100}, "interval2":{"left":1, "right":100}, "overlap2":{"left":0, "right":100}};
+        let filtering_param_ranges_limit = {"interval1":{"left":1, "right":100}, "overlap1":{"left":0, "right":100}, "interval2":{"left":1, "right":100}, "overlap2":{"left":0, "right":100}, "number1":{"left":1, "right":100}, "number2":{"left":1, "right":100}};
         let filtering_param_ranges = {}
-        let filtering_params = ['interval1', 'overlap1', 'interval2', 'overlap2']
+        let filtering_params = ['interval1', 'overlap1', 'interval2', 'overlap2', 'number1', 'number2']
         for (let i=0; i<filtering_params.length; i++){
             let p = filtering_params[i];
             filtering_param_ranges[p] = {};
