@@ -166,6 +166,22 @@ class DataLoader{
             d3.select("#overlap2_label")
                 .html(this.value);
         }
+	//number of intervals
+	let number_slider1 = document.getElementById("number1_input");
+        this.config.number1 = number_slider1.value;
+        number_slider1.oninput = function(){
+            that.config.number1 = this.value;
+            d3.select("#number1_label")
+                .html(this.value);
+        }
+
+        let number_slider2 = document.getElementById("number2_input");
+        this.config.number2 = number_slider2.value;
+        number_slider2.oninput = function(){
+            that.config.number2 = this.value;
+            d3.select("#number2_label")
+                .html(this.value);
+        }
     }
 
     get_clustering_params(clustering_alg) {

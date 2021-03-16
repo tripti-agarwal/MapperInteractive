@@ -310,13 +310,22 @@ d3.select("#mapper_loader")
                 that.side_bar.config.eccent_dist = eccent_dist_dropdown.options[eccent_dist_dropdown.selectedIndex].text;
             }
             let mapper_data = {"cols":that.side_bar.selected_cols, "all_cols":that.side_bar.all_cols, "categorical_cols":that.side_bar.categorical_cols, "config":that.side_bar.config};
-            $.post("/mapper_loader",{
-                data: JSON.stringify(mapper_data)
-            }, function(res){
-                console.log(res);
-                that.graph = new Graph(res.mapper, that.side_bar.all_cols, res.connected_components, that.side_bar.categorical_cols, that.side_bar.other_cols);
-                that.regression = new Regression(that.side_bar.all_cols);
-            })
+	    var x = parseInt(mapper_data.config.interval1);
+	    var y = parseInt(mapper_data.config.interval2);
+	    for( i=x;i<x+5;i++){
+			console.log("Hello")
+			
+			mapper_data.config.interval1 = i;
+			mapper_data.config.interval2 = i;
+			console.log(mapper_data.config.interval1)
+		    $.post("/mapper_loader",{
+		        data: JSON.stringify(mapper_data)
+		    }, function(res){
+		        console.log(res);
+		        that.graph = new Graph(res.mapper, that.side_bar.all_cols, res.connected_components, that.side_bar.categorical_cols, that.side_bar.other_cols);
+		        that.regression = new Regression(that.side_bar.all_cols);
+		    })
+	    }
         } else{
             alert("Please import a dataset frist!")
         } 
