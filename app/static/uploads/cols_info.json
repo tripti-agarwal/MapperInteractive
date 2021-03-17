@@ -1,8 +1,7 @@
 {
     "cols_numerical": [
         "x",
-        "y",
-        "z"
+        "y"
     ],
     "cols_categorical": [],
     "cols_others": []

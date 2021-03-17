@@ -58,7 +58,7 @@ function draw_mapper_param_sliders(){
     console.log("draw sliders")
     let intervals = [10, 20, 30, 40, 50];
     let overlaps = [0.25, 0.30, 0.35];
-    let numbers = [10, 20, 30, 40, 50];
+    let numbers = [1, 2, 3, 4, 5];
     let width = $(d3.select("#workspace-load_result").select(".block_body-inner").node()).width();
     let height = 30;
     let margin = {"left":5, "top":15, "right":10, "bottom":15};
@@ -71,10 +71,9 @@ function draw_mapper_param_sliders(){
                             .domain([0, 0.7])
                             // .domain([0, Math.max(...overlaps)+0.1])
                             .range([margin.left, width-margin.right]);
-
-    let number_scale = d3.scaleLinear()
+     let number_scale = d3.scaleLinear()
                             // .domain([0, Math.max(Math.max(...intervals),100)])
-                            .domain([0, Math.max(...numbers)+10])
+                            .domain([0, Math.max(...numbers)+1])
                             .range([margin.left, width-margin.right]);
 
     let interval_svg = d3.select("#mapper_interval_sliders")
@@ -210,14 +209,70 @@ function draw_mapper_param_sliders(){
         .attr("fill", "white")
         .attr("stroke", "grey")
         .attr("stroke-width", 2);
- 
+
 
     let number_svg = d3.select("#mapper_number_sliders")
         .attr("width", width)
         .attr("height", height);
-    // number
-    
-
+    number_svg.append("rect")
+        .attr("rx", 3)
+        .attr("ry", 3)
+        .attr("x", margin.left)
+        .attr("y", margin.top)
+        .attr("width", width-margin.left-margin.right)
+        .attr("height", 5)
+        .attr("fill", "#e1e1e1")
+        .attr("stroke", "#e1e1e1")
+    let number_group = number_svg.append("g").attr("id", "number_selection_group");
+    number_svg.append("rect")
+        .attr("id", "number_slider")
+        .classed("slider_handler", true)
+        .attr("x", margin.left)
+        .attr("y", margin.top-3)
+        .attr("width", 8)
+        .attr("height", 11)
+        .attr("fill", "#4CAF50")
+        .attr("stroke", "#4CAF50")
+        .on("mouseover", ()=>{
+            d3.select("#number_slider").classed("highlighted", true);
+        })
+        .on("mouseout", ()=>{
+            d3.select("#number_slider").classed("highlighted", false);
+        })
+        .call(d3.drag()
+                .on("start", ()=>{
+                    this.dragStarted = true;
+                })
+                .on("drag", ()=>{
+                    d3.select("#number_slider").attr("x", d3.event.x);
+                })
+                .on("end", ()=>{
+                    let min_dist = Infinity;
+                    let dx = d3.event.x;
+                    let final_x = d3.event.x;
+                    let final_i =numbers[0];
+                    numbers.forEach(i=>{
+                        let dist = Math.abs(dx-number_scale(i));
+                        if(dist<min_dist){
+                            min_dist = dist;
+                            final_x = number_scale(i);
+                            final_i = i;
+                        }
+                    })
+                    d3.select("#number_slider").attr("x", final_x+2);
+                    d3.select("#mapper_number_label").html(parseInt(final_i));
+                    this.dragStarted = false;
+                }));
+    let ng = number_group.selectAll("rect").data(numbers);
+    ng.exit().remove();
+    ng = og.enter().append("rect").merge(ng)
+        .attr("x", d=>number_scale(d))
+        .attr("y", margin.top-5)
+        .attr("width",12)
+        .attr("height",15)
+        .attr("fill", "white")
+        .attr("stroke", "grey")
+        .attr("stroke-width", 2);
 
 
 }
@@ -322,14 +377,12 @@ d3.select("#mapper_loader")
                 that.side_bar.config.eccent_dist = eccent_dist_dropdown.options[eccent_dist_dropdown.selectedIndex].text;
             }
             let mapper_data = {"cols":that.side_bar.selected_cols, "all_cols":that.side_bar.all_cols, "categorical_cols":that.side_bar.categorical_cols, "config":that.side_bar.config};
-	    var x = parseInt(mapper_data.config.interval1);
-	    var y = parseInt(mapper_data.config.interval2);
-	    for( i=x;i<x+5;i++){
-			console.log("Hello")
-			
-			mapper_data.config.interval1 = i;
-			mapper_data.config.interval2 = i;
-			console.log(mapper_data.config.interval1)
+	    var x = parseInt(mapper_data.config.interval1)
+	    var y = parseInt(mapper_data.config.number1)
+	    for(var i=x;i<x+y;i++){
+		    mapper_data.config.interval1 = i;
+		    mapper_data.config.interval2= i;
+		    console.log(mapper_data.config.interval1)
 		    $.post("/mapper_loader",{
 		        data: JSON.stringify(mapper_data)
 		    }, function(res){
