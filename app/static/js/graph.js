@@ -1,5 +1,7 @@
 class Graph{
-    constructor(graph_data, col_keys, connected_components, categorical_cols, other_cols=undefined){
+    constructor(graph_data, col_keys, connected_components,categorical_cols, n_intervals, other_cols=undefined){
+        this.viewer_id = "viewer-graph__graph";
+        this.graphSvg_id = "graphSVG" + n_intervals;
         this.nodes = graph_data.nodes;
         this.links = graph_data.links;
         this.col_keys = col_keys;
@@ -9,18 +11,18 @@ class Graph{
         }
         this.categorical_cols = categorical_cols;
         this.other_cols = other_cols;
-        console.log("categorical cols", this.categorical_cols)
+        //console.log("categorical cols", this.categorical_cols)
         this.assign_cc2node();
         this.find_neighbor_nodes();
-        console.log(this.nodes)
-        console.log(this.links)
-        console.log(this.col_keys)
-        console.log(this.connected_components)
-        //this.clear_mapper();
+        //console.log(this.nodes)
+        //console.log(this.links)
+        //console.log(this.col_keys)
+        //console.log(this.connected_components)
+        this.clear_mapper();
         // init graph container
-        this.width = $(d3.select(".viewer-graph__graph").node()).width();
-        this.height = Math.max($(d3.select(".viewer-graph__graph").node()).height(), 650);
-        this.graphSvg = d3.select("#graphSVG")
+        this.width = $(d3.select("#"+this.viewer_id).node()).width() / 3.2; // a little more than 3, or else it rolls over sometimes
+        this.height = Math.max($(d3.select("#"+this.viewer_id).node()).height(), 650)/3;
+        this.graphSvg = d3.select("#" + this.graphSvg_id)
             .attr("width", this.width)
             .attr("height", this.height);
         this.graphSvg_g = this.graphSvg.append("g");
@@ -46,7 +48,15 @@ class Graph{
         "Yellow, Blue":["yellow", "blue"], 
         "Green, Blue":["green", "blue"]};
         this.colorScale = d3.scaleLinear();
-
+	 
+	// text for "which" interval
+        this.graphSvg_g.append("text")
+            .attr('width', 10)
+            .attr('height', 10)
+            .attr('x', 20)
+            .attr('y', 20)
+            .attr('font-weight', 'bold')
+            .text(n_intervals);
         // this.COLORMAPS = [
         //     { 'label': '- None -', 'scheme': null },
         //     // { 'label': 'Rainbow', 'scheme': 'interpolateRainbow' },
@@ -117,7 +127,7 @@ class Graph{
                 $("#color_function_maps").prop("disabled", false);
                 $("#color_function_scale").prop("disabled", false);
             } else if(that.categorical_cols.indexOf(value)!=-1){
-                console.log(value)
+                //console.log(value)
                 let color_dict = that.fill_vertex_categorical(value);
                 that.draw_color_legend_categorical(color_dict);
                 $("#color_function_maps").prop("disabled", true);
@@ -216,7 +226,7 @@ class Graph{
     }
 
     draw_color_legend_categorical(color_dict){
-        console.log("color_dict", color_dict)
+        //console.log("color_dict", color_dict)
         // reset svg 
         $('#color-legend-svg').remove();
         $('#block_body-inner_color').append('<svg width="0" height="0" id="color-legend-svg"></svg>');
@@ -230,7 +240,7 @@ class Graph{
         let height = color_array.length*(rect_height+rect_margin)+margin*2;
         let svg = d3.select("#color-legend-svg").attr('width', width).attr('height', height);
 
-        console.log(color_array)
+        //console.log(color_array)
 
         let lg = svg.selectAll("g").data(color_array);
         lg.exit().remove();
@@ -358,8 +368,11 @@ class Graph{
     }
 
     clear_mapper(){
-        $('#graphSVG').remove();
-        $('.viewer-graph__graph').append('<svg id="graphSVG"></svg>');
+        // the svg elements are now taken care of in script.js
+        // $("#"+this.graphSvg_id).remove();
+        // $("#"+this.viewer_id).append('<svg id=' + this.graphSvg_id + '></svg>');
+
+        // todo what's the most meaningful thing to do with these?
         $('#size_function_values').remove();
         $('#size-function-container').append('<select class="custom-select"  name="size_function_values" id="size_function_values"></select>');
         $('#color_function_values').remove();
@@ -717,7 +730,7 @@ class Graph{
                     })
                     this.draw_hist();
                 }
-                console.log(this.selected_nodes)
+                //console.log(this.selected_nodes)
                 this.text_cluster_details(this.selected_nodes, this.label_column, this.labels);
             });
 
@@ -801,7 +814,7 @@ class Graph{
     }
 
     text_cluster_details(nodes, label_column, labels){
-        console.log(labels)
+        //console.log(labels)
         let details_text = "";
         let vertices_list = [];
         nodes.forEach(nId => {
