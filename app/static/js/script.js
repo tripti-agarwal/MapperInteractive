@@ -18,7 +18,7 @@ folder.onchange=function(){
             mapper_files.push(filename_i)
         }
     }
-    console.log(mapper_files);
+    // console.log(mapper_files);
     let mapper_list_container = document.getElementById("mapper-list-container-inner");
     mapper_list_container.style.maxHeight = "450px";
     // draw sliders
@@ -32,6 +32,9 @@ folder.onchange=function(){
   }
   d3.select("#draw-selected-mapper")
     .on("click", ()=>{
+        alert("unsupported for multi-scale mapper!");
+        throw "unsupported";
+
         let mapper_list_dropdown = document.getElementById("mapper_list_selection");
         if(mapper_list_dropdown.options){
             let mapper_filename = mapper_list_dropdown.options[mapper_list_dropdown.selectedIndex].text;
@@ -43,7 +46,8 @@ folder.onchange=function(){
                 success: function (response) {
                     response = JSON.parse(response);
                     console.log(response)
-                    that.graph = new Graph(response.mapper, {}, response.connected_components);
+                    that.graph = new Graph(response.mapper, {},
+                        response.connected_components, undefined, 0);
 
                     // that.side_bar = new DataLoader(response.columns, response.categorical_columns, response.other_columns);
                 },
@@ -55,7 +59,7 @@ folder.onchange=function(){
     })
 
 function draw_mapper_param_sliders(){
-    console.log("draw sliders")
+    // console.log("draw sliders")
     let intervals = [10, 20, 30, 40, 50];
     let overlaps = [0.25, 0.30, 0.35];
 
@@ -71,8 +75,6 @@ function draw_mapper_param_sliders(){
                             .domain([0, 0.7])
                             // .domain([0, Math.max(...overlaps)+0.1])
                             .range([margin.left, width-margin.right]);
-
-
     let interval_svg = d3.select("#mapper_interval_sliders")
         .attr("width", width)
         .attr("height", height);
@@ -86,6 +88,8 @@ function draw_mapper_param_sliders(){
         .attr("height", 5)
         .attr("fill", "#e1e1e1")
         .attr("stroke", "#e1e1e1")
+
+
     let interval_group = interval_svg.append("g").attr("id", "interval_selection_group");
     interval_svg.append("rect")
         .attr("id", "interval_slider")
@@ -213,7 +217,7 @@ function draw_mapper_param_sliders(){
 d3.select("#load-raw-data")
     .on("click", ()=>{
         let file_name = "3d-horse.csv";
-        console.log(file_name)
+        // console.log(file_name)
         $.ajax({
             type: "POST",
             url: "/data_process",
@@ -288,6 +292,7 @@ d3.select("#files")
 
 d3.select("#mapper_loader")
     .on("click",()=>{
+        console.log("MAPPER LOADER");
         if(that.side_bar.all_cols.length>0){
             console.log(that.side_bar.config.filter)
             if(that.side_bar.config.filter[0] === "Density"){
@@ -309,14 +314,43 @@ d3.select("#mapper_loader")
                 let eccent_dist_dropdown = document.getElementById("eccent_dist_selection2")
                 that.side_bar.config.eccent_dist = eccent_dist_dropdown.options[eccent_dist_dropdown.selectedIndex].text;
             }
-            let mapper_data = {"cols":that.side_bar.selected_cols, "all_cols":that.side_bar.all_cols, "categorical_cols":that.side_bar.categorical_cols, "config":that.side_bar.config};
-            $.post("/mapper_loader",{
-                data: JSON.stringify(mapper_data)
-            }, function(res){
-                console.log(res);
-                that.graph = new Graph(res.mapper, that.side_bar.all_cols, res.connected_components, that.side_bar.categorical_cols, that.side_bar.other_cols);
-                that.regression = new Regression(that.side_bar.all_cols);
-            })
+
+            let start_interval = parseInt(that.side_bar.config.interval1);
+            that.graphs = [];
+            $("#viewer-graph__graph").empty(); // clear all graphs
+
+            //todo Tripti change this hardcoded value to the number from the slider
+            let total_intervals = 5;
+
+            // create enough SVG elements. we do this ahead of time so that
+            // everything is in the correct order regardless of when the API calls return
+            for(let i=0; i<total_intervals; i++) {
+                let n_intervals = start_interval+i;
+                let graph_id = "graphSVG" + n_intervals;
+                $("#viewer-graph__graph")
+                    .append('<svg id=' + graph_id + '></svg>');
+            }
+
+            for(let i=0; i<total_intervals; i++) {
+                //todo is this copying necessary?
+                let config = JSON.parse(JSON.stringify(that.side_bar.config));
+                let n_intervals = start_interval+i;
+                config.interval1 = n_intervals;
+
+                let mapper_data = {"cols":that.side_bar.selected_cols, "all_cols":that.side_bar.all_cols, "categorical_cols":that.side_bar.categorical_cols, "config":config};
+                $.post("/mapper_loader",{
+                    data: JSON.stringify(mapper_data)
+                }, function(res){
+                    console.log(res);
+                    let graph = new Graph(res.mapper, that.side_bar.all_cols,
+                        res.connected_components, that.side_bar.categorical_cols,
+                        n_intervals,
+                        that.side_bar.other_cols);
+                    that.graphs.push(graph);
+                    that.regression = new Regression(that.side_bar.all_cols);
+                });
+            }
+
         } else{
             alert("Please import a dataset frist!")
         } 
@@ -334,7 +368,7 @@ d3.select("#linear_regression")
             $.post("/linear_regression", {
                 data: JSON.stringify({"nodes":selected_nodes, "dep_var":that.regression.dependent_var, "indep_vars":that.regression.indep_vars_selected})
             }, function(res){
-                console.log(res)
+                // console.log(res)
                 that.regression.draw_reg_result(res);
             })
         }
@@ -361,7 +395,7 @@ for(let i=0; i<coll.length; i++){
     coll[i].addEventListener("click", function(){
         this.classList.toggle("collapsed")
         let block_body = this.nextElementSibling;
-        console.log(block_body.id)
+        // console.log(block_body.id)
         if (block_body.style.maxHeight){
             block_body.style.maxHeight = null;
         } else {
@@ -416,7 +450,7 @@ clustering_para_range.addEventListener("click", function(){
 let label_column_dropdown = document.getElementById("label_column_selection");
 label_column_dropdown.onchange = function(){
     let label_column = label_column_dropdown.options[label_column_dropdown.selectedIndex].text;
-    console.log(label_column)
+    // console.log(label_column)
     if(that.graph){
         let labels;
         if(label_column != "row index"){
@@ -433,7 +467,7 @@ label_column_dropdown.onchange = function(){
 
                 },
                 error: function (error) {
-                    console.log("error",error);
+                    // console.log("error",error);
                 }
             })
         } else {
@@ -448,22 +482,22 @@ label_column_dropdown.onchange = function(){
 $.post("/module_extension",{
     data: ""
 }, function(res){
-    console.log(res);
+    // console.log(res);
     if(res.modules){
         let modules = res.modules;
-        console.log(modules)
+        // console.log(modules)
         modules.forEach(m_info => {
             let module_i = new New_Module(m_info);
             d3.select("#"+module_i.module_id+"_button")
                 .on("click", ()=>{
-                    console.log(module_i.module_name)
+                    // console.log(module_i.module_name)
                     if(that.graph){
                         let selected_nodes = [...that.graph.selected_nodes];
-                        console.log(selected_nodes);
+                        // console.log(selected_nodes);
                         $.post("/module_computing",{
                             data: JSON.stringify({"nodes":selected_nodes, "module_info": m_info})
                         }, function(res){
-                            console.log(res)
+                            // console.log(res)
                             module_i.data = res.s_dist.map(x=>+x);
                             // module_i.data = JSON.parse(res.module_result);
                             module_i.components.forEach(c=>{
