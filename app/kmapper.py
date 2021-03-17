@@ -5,7 +5,6 @@ from datetime import datetime
 import inspect
 import itertools
 import os
-from platform import dist
 import sys
 import warnings
 
