@@ -30,12 +30,9 @@
                 <button id="select-cluster" class="viewer-graph__toolbar-item btn">Select Clusters</button>
                 <button id="select-path" class="viewer-graph__toolbar-item btn">Select Path</button>
             </div>
-
             <div class="viewer-graph__graph" id="viewer-graph__graph">
             </div>
-
           </div>
-
     </div>
     <div class="col-md-3" style="padding-left: 0px;">
       <div class="sidebar-container" id="sidebar-container">
@@ -71,6 +68,11 @@
                       <label class="ui-form-range__label">Overlap</label>
                       <span class="ui-form-range__value" id="mapper_overlap_label">0</span>
                       <svg id="mapper_overlap_sliders"></svg>
+                    </div>
+		    <div class="form-group ui-form-range">
+                      <label class="ui-form-range__label">Number of intervals</label>
+                      <span class="ui-form-range__value" id="mapper_number_label">0</span>
+                      <svg id="mapper_number_sliders"></svg>
                     </div>
                     <div class="radio-container row">
                         <div class="col-1">
@@ -289,6 +291,17 @@
                     </div>
                     <input class="ui-form-range__input" id="overlap1_input" name="overlap1" type="range" value="50" max="50" min="5" step="1">
                   </div>
+		<div class="form-group ui-form-range">
+                    <label class="ui-form-range__label">Number of intervals</label>
+                    <span class="ui-form-range__value" id="number1_label" >50</span>
+                    <div class="param-range-container_filtering1">
+                      <div class="param-range-container-inner_filtering1" style="padding:0px;">
+                        <span class="param-range left"><input type="number" id="range-number1-left" min="0" max="100" value="5"></span>
+                        <span class="param-range right"><input type="number" id="range-number1-right" min="0" max="100" value="50"></span>
+                      </div>    
+                    </div>
+                    <input class="ui-form-range__input" id="number1_input" name="number1" type="range" value="5" max="5" min="1" step="1">
+                  </div>
                 </div>
                 <div class="filter-inner" id="filter-inner-2">
                   Dimension 2 &nbsp;
@@ -356,6 +369,17 @@
                       </div>    
                     </div>
                     <input class="ui-form-range__input" id="overlap2_input" name="overlap2" type="range" value="50" max="50" min="5" step="1">
+                  </div> 
+		<div class="form-group ui-form-range">
+                    <label class="ui-form-range__label">Number of intervals</label>
+                    <span class="ui-form-range__value" id="number2_label" >50</span>
+                    <div class="param-range-container_filtering2">
+                      <div class="param-range-container-inner_filtering2" style="padding:0px;">
+                        <span class="param-range left"><input type="number" id="range-number2-left" min="0" max="100" value="5"></span>
+                        <span class="param-range right"><input type="number" id="range-number2-right" min="0" max="100" value="50"></span>
+                      </div>    
+                    </div>
+                    <input class="ui-form-range__input" id="number2_input" name="number2" type="range" value="5" max="5" min="1" step="1">
                   </div> 
                 </div>       
               </div>
