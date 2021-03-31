@@ -387,8 +387,7 @@ d3.select("#mapper_loader")
             that.graphs = [];
             $("#viewer-graph__graph").empty(); // clear all graphs
 
-            //todo why isn't this working?
-            let total_intervals = 6; // parseInt(that.side_bar.config.number1);
+            let total_intervals = parseInt(that.side_bar.config.number1);
 
             // create enough SVG elements. we do this ahead of time so that
             // everything is in the correct order regardless of when the API calls return

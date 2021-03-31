@@ -166,6 +166,22 @@ class DataLoader{
             d3.select("#overlap2_label")
                 .html(this.value);
         }
+        //number of intervals
+        let number_slider1 = document.getElementById("number1_input");
+        this.config.number1 = number_slider1.value;
+        number_slider1.oninput = function(){
+            that.config.number1 = this.value;
+            d3.select("#number1_label")
+                .html(this.value);
+        }
+
+        let number_slider2 = document.getElementById("number2_input");
+        this.config.number2 = number_slider2.value;
+        number_slider2.oninput = function(){
+            that.config.number2 = this.value;
+            d3.select("#number2_label")
+                .html(this.value);
+        }
     }
 
     get_clustering_params(clustering_alg) {
@@ -400,9 +416,9 @@ class DataLoader{
     }
 
     edit_filtering_param(){
-        let filtering_param_ranges_limit = {"interval1":{"left":1, "right":100}, "overlap1":{"left":0, "right":100}, "interval2":{"left":1, "right":100}, "overlap2":{"left":0, "right":100}};
+        let filtering_param_ranges_limit = {"interval1":{"left":1, "right":100}, "overlap1":{"left":0, "right":100}, "interval2":{"left":1, "right":100}, "overlap2":{"left":0, "right":100}, "number1":{"left":1, "right":100}, "number2":{"left":1, "right":100}};
         let filtering_param_ranges = {}
-        let filtering_params = ['interval1', 'overlap1', 'interval2', 'overlap2']
+        let filtering_params = ['interval1', 'overlap1', 'interval2', 'overlap2','number1','number2']
         for (let i=0; i<filtering_params.length; i++){
             let p = filtering_params[i];
             filtering_param_ranges[p] = {};
