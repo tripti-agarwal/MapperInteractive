@@ -383,40 +383,71 @@ d3.select("#mapper_loader")
                 that.side_bar.config.eccent_dist = eccent_dist_dropdown.options[eccent_dist_dropdown.selectedIndex].text;
             }
 
-	    let start_interval = parseInt(that.side_bar.config.interval1);
+            let start_interval = parseInt(that.side_bar.config.interval1);
             that.graphs = [];
             $("#viewer-graph__graph").empty(); // clear all graphs
 
             let total_intervals = parseInt(that.side_bar.config.number1);
 
+
+            let all_intervals=[];
+            for(let i=0; i<total_intervals;i++) {
+                all_intervals.push(start_interval+i);
+            }
+
+            let config = JSON.parse(JSON.stringify(that.side_bar.config));
+            config['intervals'] = all_intervals;
+
             // create enough SVG elements. we do this ahead of time so that
             // everything is in the correct order regardless of when the API calls return
-            for(let i=0; i<total_intervals; i++) {
-                let n_intervals = start_interval+i;
+            for(let i=0; i<all_intervals.length; i++) {
+                let n_intervals = all_intervals[i];
                 let graph_id = "graphSVG" + n_intervals;
                 $("#viewer-graph__graph")
                     .append('<svg id=' + graph_id + '></svg>');
             }
 
-            for(let i=0; i<total_intervals; i++) {
-                //todo is this copying necessary?
-                let config = JSON.parse(JSON.stringify(that.side_bar.config));
-                let n_intervals = start_interval+i;
-                config.interval1 = n_intervals;
+            let mapper_data = {"cols":that.side_bar.selected_cols, "all_cols":that.side_bar.all_cols, "categorical_cols":that.side_bar.categorical_cols, "config":config};
+            $.post("/multiscale_mapper_loader",{
+                data: JSON.stringify(mapper_data)
+            }, function(res){
+                console.log(res);
 
-                let mapper_data = {"cols":that.side_bar.selected_cols, "all_cols":that.side_bar.all_cols, "categorical_cols":that.side_bar.categorical_cols, "config":config};
-                $.post("/mapper_loader",{
-                    data: JSON.stringify(mapper_data)
-                }, function(res){
-                    console.log(res);
-                    let graph = new Graph(res.mapper, that.side_bar.all_cols,
-                        res.connected_components, that.side_bar.categorical_cols,
-                        n_intervals,
-                        that.side_bar.other_cols);
+                let currently_selected = [];
+                function click_callback(m, node_id) {
+                    let k = 'm'+m+'_'+node_id;
+                    console.log('Clicked:', k);
+                    console.log(res['links'][k]);
+
+                    for(let i=0; i<currently_selected.length; i++) {
+                        currently_selected[i].style.fill = '#fff';
+                    }
+                    currently_selected.length = 0; // clears the array
+
+                    k_id = k.replace('_', '_node');
+                    let el = document.getElementById(k_id);
+                    el.style.fill = '#4287f5';
+                    currently_selected.push(el);
+
+                    for(let i=0; i<res['links'][k].length; i++) {
+                        let k2 = res['links'][k][i].replace('_', '_node');
+                        let el = document.getElementById(k2);
+                        el.style.fill = '#96d9b9';
+                        currently_selected.push(el);
+                    }
+                }
+
+                for(let i=0; i<all_intervals.length; i++) {
+                    console.log('i', i);
+                    let graph = new Graph(res['mappers'][i].mapper, that.side_bar.all_cols,
+                        res['mappers'][i].connected_components, that.side_bar.categorical_cols,
+                        all_intervals[i],
+                        that.side_bar.other_cols,
+                        click_callback);
                     that.graphs.push(graph);
                     that.regression = new Regression(that.side_bar.all_cols);
-                });
-            }
+                }
+            });
         } else{
             alert("Please import a dataset frist!")
         } 

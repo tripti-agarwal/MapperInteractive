@@ -1,11 +1,14 @@
 class Graph{
-    constructor(graph_data, col_keys, connected_components,categorical_cols, n_intervals, other_cols=undefined){
+    constructor(graph_data, col_keys, connected_components,categorical_cols,
+                n_intervals, other_cols=undefined, click_callback=undefined){
+        this.n_intervals = n_intervals;
         this.viewer_id = "viewer-graph__graph";
         this.graphSvg_id = "graphSVG" + n_intervals;
         this.nodes = graph_data.nodes;
         this.links = graph_data.links;
         this.col_keys = col_keys;
         this.connected_components = {};
+        this.click_callback = click_callback;
         for(let i=0; i<connected_components.length; i++){
             this.connected_components["cluster"+i] = connected_components[i];
         }
@@ -666,6 +669,9 @@ class Graph{
                 }             
             })
             .on("click",(d)=>{
+
+                this.click_callback(this.n_intervals, d.id);
+
                 this.clicking = true;
                 if(this.if_select_node){
                     this.unhighlight_selectable();
@@ -739,7 +745,7 @@ class Graph{
         ng.append("circle")
             .classed("viewer-graph__vertex",true)
             .attr("fill", "#fff")
-            .attr("id",(d)=>"node"+d.id)
+            .attr("id",(d)=> "m"+this.n_intervals+"_"+ "node"+d.id)
             .attr("r", 12);
 
         let lg = this.link_group.selectAll("line").data(this.links);

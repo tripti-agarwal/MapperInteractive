@@ -22,6 +22,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.neighbors import KernelDensity
 from scipy.spatial import distance
 from sklearn.cluster import KMeans
+from collections import defaultdict
 import importlib
 
 
@@ -188,6 +189,93 @@ def get_graph():
                 node['categorical_cols_summary'][col] = data_categorical_i[col].value_counts().to_dict()
     connected_components = compute_cc(mapper_result)
     return jsonify(mapper=mapper_result, connected_components=connected_components)
+
+@app.route('/multiscale_mapper_loader', methods=['POST','GET'])
+def get_multiscale_graph():
+    mapper_data = request.form.get('data')
+    mapper_data = json.loads(mapper_data)
+    selected_cols = mapper_data['cols']
+    all_cols = mapper_data['all_cols'] # all numerical cols
+    categorical_cols = mapper_data['categorical_cols']
+    data = pd.read_csv(APP_STATIC+"/uploads/processed_data.csv")
+    data_categorical = data[categorical_cols]
+    data = data[all_cols]
+
+    # data = data[selected_cols].astype("float")
+    config = mapper_data["config"]
+    intervals = config['intervals']
+    norm_type = config["norm_type"]
+    clustering_alg = config["clustering_alg"]
+    clustering_alg_params = config["clustering_alg_params"]
+    # eps = config["eps"]
+    # min_samples = config["min_samples"]
+
+    data_idx2cluster = defaultdict(list)
+    res = []
+    for interval in intervals:
+        #### TODO: update filter_parameters ####
+        filter_parameters = config
+
+        # filter functions
+        filter_function = config["filter"]
+        if len(filter_function) == 1:
+            overlap = float(config["overlap1"]) / 100
+        elif len(filter_function) == 2:
+            interval = [interval, interval]
+            overlap = [float(config["overlap1"])/100, float(config["overlap2"])/100]
+        print('interval,overlap', interval, overlap)
+        # TODO: fix normalization (only point cloud column needs to be modified?)
+        # normalization
+        if norm_type == "none":
+            pass
+        elif norm_type == "0-1": # axis=0, min-max norm for each column
+            scaler = MinMaxScaler()
+            data = scaler.fit_transform(data)
+        else:
+            data = sklearn.preprocessing.normalize(data, norm=norm_type, axis=0, copy=False, return_norm=False)
+        data = pd.DataFrame(data, columns = all_cols)
+        mapper_result = run_mapper(data, selected_cols, interval, overlap, clustering_alg, clustering_alg_params, filter_function, filter_parameters)
+        if len(categorical_cols) > 0:
+            for node in mapper_result['nodes']:
+                print("node", node['id'])
+                vertices = node['vertices']
+                data_categorical_i = data_categorical.iloc[vertices]
+                node['categorical_cols_summary'] = {}
+                for col in categorical_cols:
+                    node['categorical_cols_summary'][col] = data_categorical_i[col].value_counts().to_dict()
+                
+        # establish links for multiscale mapper
+        for node in mapper_result['nodes']:
+            multiscale_key = f'm{interval}_{node["id"]}'
+            for v in node['vertices']:
+                data_idx2cluster[v].append(multiscale_key)
+
+        print(mapper_result)
+        print('data_idx2cluster', data_idx2cluster)
+        connected_components = compute_cc(mapper_result)
+
+        res.append({
+            'mapper': mapper_result,
+            'connected_components': connected_components
+        })
+    
+    # figure out links between mapper at different scales
+    links = defaultdict(set)
+    for related_clusters in data_idx2cluster.values():
+        for c0 in related_clusters:
+            for c1 in related_clusters:
+                m0 = c0.split('_')[0]
+                m1 = c1.split('_')[0]
+                if m0 != m1:
+                    links[c0].add(c1)
+                    links[c1].add(c0)
+    for k in links.keys():
+        links[k] = list(links[k])
+
+    res = {'mappers': res, 'links': links}
+    print('links', links)
+
+    return jsonify(res)
 
 @app.route('/linear_regression', methods=['POST','GET'])
 def linear_regression():
