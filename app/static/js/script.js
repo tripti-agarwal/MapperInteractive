@@ -410,8 +410,8 @@ d3.select("#mapper_loader")
                 console.log(res);
                 for(let i=0; i<all_intervals.length; i++) {
                     console.log('i', i);
-                    let graph = new Graph(res[i].mapper, that.side_bar.all_cols,
-                        res[i].connected_components, that.side_bar.categorical_cols,
+                    let graph = new Graph(res['mappers'][i].mapper, that.side_bar.all_cols,
+                        res['mappers'][i].connected_components, that.side_bar.categorical_cols,
                         all_intervals[i],
                         that.side_bar.other_cols);
                     that.graphs.push(graph);

@@ -243,13 +243,37 @@ def get_multiscale_graph():
                 node['categorical_cols_summary'] = {}
                 for col in categorical_cols:
                     node['categorical_cols_summary'][col] = data_categorical_i[col].value_counts().to_dict()
+                
+        # establish links for multiscale mapper
+        for node in mapper_result['nodes']:
+            multiscale_key = f'm{interval}_{node["id"]}'
+            for v in node['vertices']:
+                data_idx2cluster[v].append(multiscale_key)
+
         print(mapper_result)
+        print('data_idx2cluster', data_idx2cluster)
         connected_components = compute_cc(mapper_result)
 
         res.append({
             'mapper': mapper_result,
             'connected_components': connected_components
         })
+    
+    # figure out links between mapper at different scales
+    links = defaultdict(set)
+    for related_clusters in data_idx2cluster.values():
+        for c0 in related_clusters:
+            for c1 in related_clusters:
+                m0 = c0.split('_')[0]
+                m1 = c1.split('_')[0]
+                if m0 != m1:
+                    links[c0].add(c1)
+                    links[c1].add(c0)
+    for k in links.keys():
+        links[k] = list(links[k])
+
+    res = {'mappers': res, 'links': links}
+    print('links', links)
 
     return jsonify(res)
 
