@@ -1,5 +1,7 @@
 class Graph{
-    constructor(graph_data, col_keys, connected_components,categorical_cols, n_intervals, other_cols=undefined){
+    constructor(graph_data, col_keys, connected_components,categorical_cols,
+                n_intervals, other_cols=undefined){
+        this.n_intervals = n_intervals;
         this.viewer_id = "viewer-graph__graph";
         this.graphSvg_id = "graphSVG" + n_intervals;
         this.nodes = graph_data.nodes;
@@ -666,6 +668,7 @@ class Graph{
                 }             
             })
             .on("click",(d)=>{
+                console.log("clicked: " , d);
                 this.clicking = true;
                 if(this.if_select_node){
                     this.unhighlight_selectable();

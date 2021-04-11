@@ -389,34 +389,35 @@ d3.select("#mapper_loader")
 
             let total_intervals = parseInt(that.side_bar.config.number1);
 
+
+            let all_intervals = [2,3,4,5,6];
+            let config = JSON.parse(JSON.stringify(that.side_bar.config));
+            config['intervals'] = all_intervals;
+
             // create enough SVG elements. we do this ahead of time so that
             // everything is in the correct order regardless of when the API calls return
-            for(let i=0; i<total_intervals; i++) {
-                let n_intervals = start_interval+i;
+            for(let i=0; i<all_intervals.length; i++) {
+                let n_intervals = all_intervals[i];
                 let graph_id = "graphSVG" + n_intervals;
                 $("#viewer-graph__graph")
                     .append('<svg id=' + graph_id + '></svg>');
             }
 
-            for(let i=0; i<total_intervals; i++) {
-                //todo is this copying necessary?
-                let config = JSON.parse(JSON.stringify(that.side_bar.config));
-                let n_intervals = start_interval+i;
-                config.interval1 = n_intervals;
-
-                let mapper_data = {"cols":that.side_bar.selected_cols, "all_cols":that.side_bar.all_cols, "categorical_cols":that.side_bar.categorical_cols, "config":config};
-                $.post("/mapper_loader",{
-                    data: JSON.stringify(mapper_data)
-                }, function(res){
-                    console.log(res);
-                    let graph = new Graph(res.mapper, that.side_bar.all_cols,
-                        res.connected_components, that.side_bar.categorical_cols,
-                        n_intervals,
+            let mapper_data = {"cols":that.side_bar.selected_cols, "all_cols":that.side_bar.all_cols, "categorical_cols":that.side_bar.categorical_cols, "config":config};
+            $.post("/multiscale_mapper_loader",{
+                data: JSON.stringify(mapper_data)
+            }, function(res){
+                console.log(res);
+                for(let i=0; i<all_intervals.length; i++) {
+                    console.log('i', i);
+                    let graph = new Graph(res[i].mapper, that.side_bar.all_cols,
+                        res[i].connected_components, that.side_bar.categorical_cols,
+                        all_intervals[i],
                         that.side_bar.other_cols);
                     that.graphs.push(graph);
                     that.regression = new Regression(that.side_bar.all_cols);
-                });
-            }
+                }
+            });
         } else{
             alert("Please import a dataset frist!")
         } 
