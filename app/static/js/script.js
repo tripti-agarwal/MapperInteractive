@@ -61,7 +61,8 @@ function draw_mapper_param_sliders(){
     //console.log("draw sliders")
     let intervals = [10, 20, 30, 40, 50];
     let overlaps = [0.25, 0.30, 0.35];
-    let numbers = [1, 2, 3, 4, 5];
+    let numbers = [1, 2, 3, 4, 5, 6];
+    let strides = [1, 2, 3, 4, 5, 6]
     let width = $(d3.select("#workspace-load_result").select(".block_body-inner").node()).width();
     let height = 30;
     let margin = {"left":5, "top":15, "right":10, "bottom":15};
@@ -77,6 +78,10 @@ function draw_mapper_param_sliders(){
      let number_scale = d3.scaleLinear()
                             // .domain([0, Math.max(Math.max(...intervals),100)])
                             .domain([0, Math.max(...numbers)+1])
+                            .range([margin.left, width-margin.right]);
+    let stride_scale = d3.scaleLinear()
+                            // .domain([0, Math.max(Math.max(...intervals),100)])
+                            .domain([0, Math.max(...strides)+10])
                             .range([margin.left, width-margin.right]);
 
     let interval_svg = d3.select("#mapper_interval_sliders")
@@ -270,8 +275,72 @@ function draw_mapper_param_sliders(){
                 }));
     let ng = number_group.selectAll("rect").data(numbers);
     ng.exit().remove();
-    ng = og.enter().append("rect").merge(ng)
+    ng = ng.enter().append("rect").merge(ng)
         .attr("x", d=>number_scale(d))
+        .attr("y", margin.top-5)
+        .attr("width",12)
+        .attr("height",15)
+        .attr("fill", "white")
+        .attr("stroke", "grey")
+        .attr("stroke-width", 2);
+
+
+    let stride_svg = d3.select("#mapper_stride_sliders")
+        .attr("width", width)
+        .attr("height", height);
+    stride_svg.append("rect")
+        .attr("rx", 3)
+        .attr("ry", 3)
+        .attr("x", margin.left)
+        .attr("y", margin.top)
+        .attr("width", width-margin.left-margin.right)
+        .attr("height", 5)
+        .attr("fill", "#e1e1e1")
+        .attr("stroke", "#e1e1e1")
+    let stride_group = stride_svg.append("g").attr("id", "stride_selection_group");
+    stride_svg.append("rect")
+        .attr("id", "stride_slider")
+        .classed("slider_handler", true)
+        .attr("x", margin.left)
+        .attr("y", margin.top-3)
+        .attr("width", 8)
+        .attr("height", 11)
+        .attr("fill", "#4CAF50")
+        .attr("stroke", "#4CAF50")
+        .on("mouseover", ()=>{
+            d3.select("#stride_slider").classed("highlighted", true);
+        })
+        .on("mouseout", ()=>{
+            d3.select("#stride_slider").classed("highlighted", false);
+        })
+        .call(d3.drag()
+                .on("start", ()=>{
+                    this.dragStarted = true;
+                })
+                .on("drag", ()=>{
+                    d3.select("#stride_slider").attr("x", d3.event.x);
+                })
+                .on("end", ()=>{
+                    let min_dist = Infinity;
+                    let dx = d3.event.x;
+                    let final_x = d3.event.x;
+                    let final_i =strides[0];
+                    strides.forEach(i=>{
+                        let dist = Math.abs(dx-stride_scale(i));
+                        if(dist<min_dist){
+                            min_dist = dist;
+                            final_x = stride_scale(i);
+                            final_i = i;
+                        }
+                    })
+                    d3.select("#stride_slider").attr("x", final_x+2);
+                    d3.select("#mapper_stride_label").html(parseInt(final_i)+2);
+                    this.dragStarted = false;
+                }));
+    let sg = stride_group.selectAll("rect").data(strides);
+    sg.exit().remove();
+    sg = sg.enter().append("rect").merge(sg)
+        .attr("x", d=>stride_scale(d))
         .attr("y", margin.top-5)
         .attr("width",12)
         .attr("height",15)
@@ -389,10 +458,10 @@ d3.select("#mapper_loader")
 
             let total_intervals = parseInt(that.side_bar.config.number1);
 
-
+	    let stride_value =  parseInt(that.side_bar.config.stride1);
             let all_intervals=[];
             for(let i=0; i<total_intervals;i++) {
-                all_intervals.push(start_interval+i);
+                all_intervals.push(start_interval+(i*stride_value));
             }
 
             let config = JSON.parse(JSON.stringify(that.side_bar.config));

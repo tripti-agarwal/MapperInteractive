@@ -182,6 +182,22 @@ class DataLoader{
             d3.select("#number2_label")
                 .html(this.value);
         }
+	//stride
+        let stride_slider1 = document.getElementById("stride1_input");
+        this.config.stride1 = stride_slider1.value;
+        stride_slider1.oninput = function(){
+            that.config.stride1 = this.value;
+            d3.select("#stride1_label")
+                .html(this.value);
+        }
+
+        let stride_slider2 = document.getElementById("stride2_input");
+        this.config.stride2 = stride_slider2.value;
+        stride_slider2.oninput = function(){
+            that.config.stride2 = this.value;
+            d3.select("#stride2_label")
+                .html(this.value);
+        }
     }
 
     get_clustering_params(clustering_alg) {
@@ -255,6 +271,11 @@ class DataLoader{
 
         $("#"+range_id+"-range-left-container").append('<input type="number" id='+range_id+'-range-left min="0.01" value='+ min_val +' step='+step+'>');
         $("#"+range_id+"-range-right-container").append('<input type="number" id='+range_id+'-range-right min="0.01" value='+ max_val +' step='+step+'>');
+ 
+	
+    
+
+        
 
         $('#'+range_id+"-form-container").append('<input class="ui-form-range__input" id='+ range_id +'-input name='+ range_id +'-input type="range" value=' + initial_val +' max='+ max_val +' min='+ min_val +' step='+ step +'>');
     }
@@ -416,9 +437,9 @@ class DataLoader{
     }
 
     edit_filtering_param(){
-        let filtering_param_ranges_limit = {"interval1":{"left":1, "right":100}, "overlap1":{"left":0, "right":100}, "interval2":{"left":1, "right":100}, "overlap2":{"left":0, "right":100}, "number1":{"left":1, "right":100}, "number2":{"left":1, "right":100}};
+        let filtering_param_ranges_limit = {"interval1":{"left":1, "right":100}, "overlap1":{"left":0, "right":100}, "interval2":{"left":1, "right":100}, "overlap2":{"left":0, "right":100}, "number1":{"left":1, "right":100}, "number2":{"left":1, "right":100}, "stride1":{"left":1, "right":100}, "stride2":{"left":1, "right":100}};
         let filtering_param_ranges = {}
-        let filtering_params = ['interval1', 'overlap1', 'interval2', 'overlap2','number1','number2']
+        let filtering_params = ['interval1', 'overlap1', 'interval2', 'overlap2','number1','number2','stride1','stride2']
         for (let i=0; i<filtering_params.length; i++){
             let p = filtering_params[i];
             filtering_param_ranges[p] = {};
