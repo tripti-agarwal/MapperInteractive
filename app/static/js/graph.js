@@ -53,7 +53,7 @@ class Graph{
         this.colorScale = d3.scaleLinear();
 	 
 	// text for "which" interval
-        this.graphSvg_g.append("text")
+        this.graphSvg.append("text")
             .attr('width', 10)
             .attr('height', 10)
             .attr('x', 20)
