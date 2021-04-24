@@ -84,6 +84,30 @@ class Graph{
         this.select_view();
         this.draw_mapper();
         this.selection_nodes();
+
+        setTimeout(()=> {
+            this.zoomFit(0.1);
+        }, 500);
+    }
+
+    zoomFit(transitionDuration) {
+        var bounds = this.graphSvg_g.node().getBBox();
+        var parent = this.graphSvg_g.node().parentElement;
+        var fullWidth = parent.clientWidth || parent.parentNode.clientWidth,
+            fullHeight = parent.clientHeight || parent.parentNode.clientHeight;
+        var width = bounds.width,
+            height = bounds.height;
+        var midX = bounds.x + width / 2,
+            midY = bounds.y + height / 2;
+        if (width == 0 || height == 0) return; // nothing to fit
+        var scale = 0.55 / Math.max(width / fullWidth, height / fullHeight);
+        var translate = [fullWidth / 2 - scale * midX, fullHeight / 2 - scale * midY];
+
+        var transform = d3.zoomIdentity
+            .translate(translate[0], translate[1])
+            .scale(scale);
+
+        this.graphSvg_g.attr('transform', transform);
     }
 
     color_functions(){
