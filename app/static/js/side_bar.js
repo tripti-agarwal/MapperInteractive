@@ -54,12 +54,12 @@ class DataLoader{
         this.get_clustering_params("DBSCAN");
         clustering_dropdown.onchange = function(){
             let clustering_alg = clustering_dropdown.options[clustering_dropdown.selectedIndex].text;
-            console.log(clustering_alg)
+            //console.log(clustering_alg)
             that.config.clustering_alg = clustering_alg;
             that.config.clustering_alg_params = {};
             that.draw_clustering_params(clustering_alg);
             that.get_clustering_params(clustering_alg);
-            console.log(that.config.clustering_alg_params)
+            //console.log(that.config.clustering_alg_params)
         }
 
         // // eps
@@ -437,7 +437,7 @@ class DataLoader{
     }
 
     edit_filtering_param(){
-        let filtering_param_ranges_limit = {"interval1":{"left":1, "right":100}, "overlap1":{"left":0, "right":100}, "interval2":{"left":1, "right":100}, "overlap2":{"left":0, "right":100}, "number1":{"left":1, "right":100}, "number2":{"left":1, "right":100}, "stride1":{"left":1, "right":100}, "stride2":{"left":1, "right":100}};
+        let filtering_param_ranges_limit = {"interval1":{"left":1, "right":100}, "overlap1":{"left":0, "right":100}, "interval2":{"left":1, "right":100}, "overlap2":{"left":0, "right":100}, "number1":{"left":1, "right":6}, "number2":{"left":1, "right":6}, "stride1":{"left":1, "right":6}, "stride2":{"left":1, "right":6}};
         let filtering_param_ranges = {}
         let filtering_params = ['interval1', 'overlap1', 'interval2', 'overlap2','number1','number2','stride1','stride2']
         for (let i=0; i<filtering_params.length; i++){

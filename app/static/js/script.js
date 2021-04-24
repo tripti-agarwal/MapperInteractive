@@ -81,7 +81,7 @@ function draw_mapper_param_sliders(){
                             .range([margin.left, width-margin.right]);
     let stride_scale = d3.scaleLinear()
                             // .domain([0, Math.max(Math.max(...intervals),100)])
-                            .domain([0, Math.max(...strides)+10])
+                            .domain([0, Math.max(...strides)+1])
                             .range([margin.left, width-margin.right]);
 
     let interval_svg = d3.select("#mapper_interval_sliders")
@@ -334,7 +334,7 @@ function draw_mapper_param_sliders(){
                         }
                     })
                     d3.select("#stride_slider").attr("x", final_x+2);
-                    d3.select("#mapper_stride_label").html(parseInt(final_i)+2);
+                    d3.select("#mapper_stride_label").html(strides[0]);
                     this.dragStarted = false;
                 }));
     let sg = stride_group.selectAll("rect").data(strides);
@@ -429,9 +429,9 @@ d3.select("#files")
 
 d3.select("#mapper_loader")
     .on("click",()=>{
-	console.log("MAPPER LOADER");
+	//console.log("MAPPER LOADER");
         if(that.side_bar.all_cols.length>0){
-            console.log(that.side_bar.config.filter)
+            //console.log(that.side_bar.config.filter)
             if(that.side_bar.config.filter[0] === "Density"){
                 that.side_bar.config.density_bandwidth = parseFloat(d3.select("#density_bandwidth_values").node().value);
                 let density_kernel_dropdown = document.getElementById("density_kernel_selection");
@@ -480,13 +480,13 @@ d3.select("#mapper_loader")
             $.post("/multiscale_mapper_loader",{
                 data: JSON.stringify(mapper_data)
             }, function(res){
-                console.log(res);
+                //console.log(res);
 
                 let currently_selected = [];
                 function click_callback(m, node_id) {
                     let k = 'm'+m+'_'+node_id;
-                    console.log('Clicked:', k);
-                    console.log(res['links'][k]);
+                    //console.log('Clicked:', k);
+                    //console.log(res['links'][k]);
 
                     for(let i=0; i<currently_selected.length; i++) {
                         currently_selected[i].style.fill = '#fff';
@@ -507,7 +507,7 @@ d3.select("#mapper_loader")
                 }
 
                 for(let i=0; i<all_intervals.length; i++) {
-                    console.log('i', i);
+                    //console.log('i', i);
                     let graph = new Graph(res['mappers'][i].mapper, that.side_bar.all_cols,
                         res['mappers'][i].connected_components, that.side_bar.categorical_cols,
                         all_intervals[i],
