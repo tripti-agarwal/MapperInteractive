@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <title>Mapper Interactive</title>
+  <title>Interactive Multiscale Mapper</title>
   <script src="https://d3js.org/d3.v5.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
@@ -17,14 +17,14 @@
 
 <body>
   <div style="padding-top: 10px; padding-left:20px;">
-      <h4>Mapper Interactive</h4>
+      <h4>Interactive Multiscale Mapper</h4>
 
   </div>
 <div id="root" class="container-fluid">
   <div class="row" style="margin-top: 10px;" id="workspace">
     <div class="col-md-9">
           <div id="workspace-graph">
-            <div class="viewer-graph__toolbar">
+            <div class="viewer-graph__toolbar" hidden>
                 <button id="unselect-view" class="viewer-graph__toolbar-item btn">View</button>
                 <button id="select-node" class="viewer-graph__toolbar-item btn">Select Nodes</button>
                 <button id="select-cluster" class="viewer-graph__toolbar-item btn">Select Clusters</button>
@@ -36,7 +36,7 @@
     </div>
     <div class="col-md-3" style="padding-left: 0px;">
       <div class="sidebar-container" id="sidebar-container">
-        <div id="workspace-load_result" class="block">
+        <div id="workspace-load_result" class="block" hidden>
           <div class="block_title">Load Mapper Graphs</div>
           <div class="block_body" style="max-height: 1000px">
             <div class="block_body-inner">
@@ -414,7 +414,7 @@
             </div>   
           </div>
         </div>
-        <div id="workspace-color_functions" class="block"> 
+        <div id="workspace-color_functions" class="block" hidden>  
           <div class="block_title">Color Functions</div>
           <div class="block_body" style="max-height: 1000px"> 
             <div class="block_body-inner" id = "block_body-inner_color">
@@ -456,7 +456,7 @@
             </div>
           </div>  
         </div>
-        <div id="workspace-size_functions" class="block">
+        <div id="workspace-size_functions" class="block" hidden>
           <div class="block_title">Size Functions</div>
           <div class="block_body" style="max-height: 1000px">
             <div class="block_body-inner">
@@ -467,7 +467,7 @@
             </div>
           </div>
         </div>
-        <div id="regression-panel" class="block">
+        <div id="regression-panel" class="block" hidden>
           <div class="block_title">Linear Regression</div>
           <div class="block_body" style="max-height: 1000px">
             <div class="block_body-inner">
@@ -492,7 +492,7 @@
             </div>
           </div>
         </div>
-        <div id="PCA-panel" class="block"> 
+        <div id="PCA-panel" class="block" hidden> 
           <div class="block_title">PCA</div>
           <div class="block_body" style="max-height: 1000px">
             <div class="block_body-inner">
@@ -500,13 +500,13 @@
             </div>
           </div>
         </div>
-        <div id="workspace-histogram" class="block">
+        <div id="workspace-histogram" class="block" hidden>
           <div class="block_title">Histogram</div>
           <div class="block_body" style="max-height: 500px; overflow: auto;" id="block_body_histogram">
             <div class="block_body-inner"></div>
           </div>
         </div>
-        <div id="workspace-nodes-details" class="block">
+        <div id="workspace-nodes-details" class="block" hidden>
           <div class="block_title">Cluster Details</div>
           <div class="block_body" style="max-height: 500px; overflow: auto;" id="block_body_nodes-details">
             <div class="block_body-inner">
