@@ -694,7 +694,7 @@ class Graph{
             })
             .on("click",(d)=>{
 
-                this.click_callback(this.n_intervals, d.id);
+                this.click_callback(this.n_intervals, d.id, d3.event.shiftKey);
 
                 this.clicking = true;
                 if(this.if_select_node){

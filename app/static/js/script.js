@@ -483,15 +483,22 @@ d3.select("#mapper_loader")
                 //console.log(res);
 
                 let currently_selected = [];
-                function click_callback(m, node_id) {
+                let current_m = undefined;
+                function click_callback(m, node_id, try_append) {
                     let k = 'm'+m+'_'+node_id;
                     //console.log('Clicked:', k);
                     //console.log(res['links'][k]);
 
-                    for(let i=0; i<currently_selected.length; i++) {
-                        currently_selected[i].style.fill = '#fff';
+                    // clear the previous selection, unless we want to append and its
+                    // possible to append
+                    if(!(try_append && m == current_m)) {
+                        for(let i=0; i<currently_selected.length; i++) {
+                            currently_selected[i].style.fill = '#fff';
+                        }
+                        currently_selected.length = 0; // clears the array
                     }
-                    currently_selected.length = 0; // clears the array
+
+                    current_m = m;
 
                     k_id = k.replace('_', '_node');
                     let el = document.getElementById(k_id);
