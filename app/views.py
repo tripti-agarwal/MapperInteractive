@@ -3,6 +3,7 @@ from app import app
 from app import APP_STATIC
 from app import APP_ROOT
 import json
+from mogutda import SimplicialComplex
 import numpy as np
 import pandas as pd
 import os
@@ -167,7 +168,7 @@ def get_graph():
     elif len(filter_function) == 2:
         interval = [int(config["interval1"]), int(config["interval2"])]
         overlap = [float(config["overlap1"])/100, float(config["overlap2"])/100]
-    print(interval, overlap)
+    #print(interval, overlap)
     # TODO: fix normalization (only point cloud column needs to be modified?)
     # normalization
     if norm_type == "none":
@@ -181,7 +182,7 @@ def get_graph():
     mapper_result = run_mapper(data, selected_cols, interval, overlap, clustering_alg, clustering_alg_params, filter_function, filter_parameters)
     if len(categorical_cols) > 0:
         for node in mapper_result['nodes']:
-            print("node", node['id'])
+            #print("node", node['id'])
             vertices = node['vertices']
             data_categorical_i = data_categorical.iloc[vertices]
             node['categorical_cols_summary'] = {}
@@ -223,7 +224,7 @@ def get_multiscale_graph():
         elif len(filter_function) == 2:
             interval = [interval, interval]
             overlap = [float(config["overlap1"])/100, float(config["overlap2"])/100]
-        print('interval,overlap', interval, overlap)
+        #print('interval,overlap', interval, overlap)
         # TODO: fix normalization (only point cloud column needs to be modified?)
         # normalization
         if norm_type == "none":
@@ -237,7 +238,7 @@ def get_multiscale_graph():
         mapper_result = run_mapper(data, selected_cols, interval, overlap, clustering_alg, clustering_alg_params, filter_function, filter_parameters)
         if len(categorical_cols) > 0:
             for node in mapper_result['nodes']:
-                print("node", node['id'])
+                #print("node", node['id'])
                 vertices = node['vertices']
                 data_categorical_i = data_categorical.iloc[vertices]
                 node['categorical_cols_summary'] = {}
@@ -250,8 +251,8 @@ def get_multiscale_graph():
             for v in node['vertices']:
                 data_idx2cluster[v].append(multiscale_key)
 
-        print(mapper_result)
-        print('data_idx2cluster', data_idx2cluster)
+        print(mapper_result["betti"])
+        #print('data_idx2cluster', data_idx2cluster)
         connected_components = compute_cc(mapper_result)
 
         res.append({
@@ -273,7 +274,7 @@ def get_multiscale_graph():
         links[k] = list(links[k])
 
     res = {'mappers': res, 'links': links}
-    print('links', links)
+    #print('links', links)
 
     return jsonify(res)
 
@@ -283,7 +284,7 @@ def linear_regression():
     selected_nodes = json_data['nodes']
     y_name = json_data['dep_var']
     X_names = json_data['indep_vars']
-    print(y_name, X_names)
+    #print(y_name, X_names)
     with open(APP_STATIC+"/uploads/nodes_detail.json") as f:
         nodes_detail = json.load(f)
     data = pd.read_csv(APP_STATIC+"/uploads/processed_data.csv")
@@ -298,13 +299,13 @@ def linear_regression():
     X = data.loc[:,X_names]
     X2 = sm.add_constant(X)
     reg = sm.OLS(y, X2)
-    print(y,X2)
+    #print(y,X2)
     result = reg.fit()
     conf_int = np.array(result.conf_int())
     conf_int_new = []
     for i in range(conf_int.shape[0]):
         conf_int_new.append(list(conf_int[i,:]))
-    print(result.summary())
+    #print(result.summary())
     return jsonify(params=list(result.params), pvalues=list(result.pvalues), conf_int=conf_int_new, stderr=list(result.bse))
 
 @app.route('/pca', methods=['POST','GET'])
@@ -314,12 +315,12 @@ def pca():
     n_components = 2
     '''
     selected_nodes = json.loads(request.form.get('data'))['nodes']
-    print(selected_nodes)
+    #print(selected_nodes)
     data = pd.read_csv(APP_STATIC+"/uploads/processed_data.csv")
     with open(APP_STATIC+"/uploads/cols_info.json") as f:
         cols_dict = json.load(f)
     cols = cols_dict['cols_numerical']
-    print(cols)
+    #print(cols)
     with open(APP_STATIC+"/uploads/nodes_detail.json") as f:
         nodes_detail = json.load(f)
     if len(selected_nodes) > 0:
@@ -333,8 +334,8 @@ def pca():
     data_new = pca.fit_transform(data.loc[:,cols])
     data_new = pd.DataFrame(data_new)
     data_new.columns = ['pc1', 'pc2']
-    print(data.shape)
-    print(data_new)
+    #print(data.shape)
+    #print(data_new)
     # clustering
     if len(selected_nodes)>0:
         data_new['kmeans_cluster'] = KMeans(n_clusters=min(len(selected_nodes), 6), random_state=0).fit(data_new).labels_
@@ -396,7 +397,7 @@ def run_mapper(data_array, col_names, interval, overlap, clustering_alg, cluster
         return _parse_result(km_result, data_array)
 
 def _call_kmapper(data, col_names, interval, overlap, clustering_alg, clustering_alg_params, filter_function, filter_parameters=None):
-    print(filter_parameters)
+    #print(filter_parameters)
     mapper = KeplerMapper()
     if len(col_names) == 1:
         data_new = np.array(data[col_names[0]]).reshape(-1,1)
@@ -420,9 +421,9 @@ def _call_kmapper(data, col_names, interval, overlap, clustering_alg, clustering
             lens.append(lens_f)
         lens = np.concatenate((lens[0], lens[1]), axis=1)
     # clusterer = sklearn.cluster.DBSCAN(eps=eps, min_samples=min_samples, metric='euclidean', n_jobs=8)
-    print(data_new.shape)
-    print(np.max(np.max(data_new)))
-    print(np.mean(np.mean(data_new)))
+    #print(data_new.shape)
+    #print(np.max(np.max(data_new)))
+    #print(np.mean(np.mean(data_new)))
     if clustering_alg == "DBSCAN":
         graph = mapper.map_parallel(lens, data_new, clusterer=cluster.DBSCAN(eps=float(clustering_alg_params["eps"]), min_samples=float(clustering_alg_params["min_samples"])), cover=Cover(n_cubes=interval, perc_overlap=overlap))
     elif clustering_alg == "Agglomerative Clustering":
@@ -432,9 +433,9 @@ def _call_kmapper(data, col_names, interval, overlap, clustering_alg, clustering
         # graph = mapper.map_parallel(lens, data_new, clusterer=cluster.MeanShift(bandwidth=float(clustering_alg_params["bandwidth"])), cover=Cover(n_cubes=interval, perc_overlap=overlap))
         graph = mapper.map_parallel(lens, data_new, clusterer=cluster.MeanShift(bandwidth=1), cover=Cover(n_cubes=interval, perc_overlap=overlap))
         
-    print(len(graph['nodes'].keys()))
+    #print(len(graph['nodes'].keys()))
     # graph = mapper.map(lens, data_new, clusterer=cluster.DBSCAN(eps=eps, min_samples=min_samples), cover=Cover(n_cubes=interval, perc_overlap=overlap))
-
+    #print("Betti0=",SimplicialComplex(simplices=graph['simplices']).betti_number(0))
     return graph
 
 def compute_lens(f, data, mapper, filter_parameters=None):
@@ -444,7 +445,7 @@ def compute_lens(f, data, mapper, filter_parameters=None):
     elif f == "Density":
         density_kernel = filter_parameters['density_kernel']
         density_bandwidth = filter_parameters['density_bandwidth']
-        print("density", density_kernel, density_bandwidth)
+        #print("density", density_kernel, density_bandwidth)
         kde = KernelDensity(kernel=density_kernel, bandwidth=density_bandwidth).fit(data_array)
         lens = kde.score_samples(data_array).reshape(-1,1)
         scaler = MinMaxScaler()
@@ -452,7 +453,7 @@ def compute_lens(f, data, mapper, filter_parameters=None):
     elif f == "Eccentricity":
         p = filter_parameters['eccent_p']
         distance_matrix = filter_parameters['eccent_dist']
-        print("eccent", p, distance_matrix)
+        #print("eccent", p, distance_matrix)
         pdist = distance.squareform(distance.pdist(data_array, metric=distance_matrix))
         lens = np.array([(np.sum(pdist**p, axis=1)/len(data_array))**(1/p)]).reshape(-1,1)
     elif f == "PC1":
@@ -471,7 +472,7 @@ def _parse_result(graph, data_array=[]):
     if len(data_array)>0:
         col_names = data_array.columns
         data_array = np.array(data_array)
-    data = {"nodes": [], "links": []}
+    data = {"nodes": [], "links": [], "betti":[]}
 
     # nodes
     node_keys = graph['nodes'].keys()
@@ -516,6 +517,12 @@ def _parse_result(graph, data_array=[]):
             links.add((left_id, right_id))
     for link in links:
         data['links'].append({"source": link[0], "target": link[1]})
+    betti0 = int(SimplicialComplex(simplices=graph['simplices']).betti_number(0))
+    betti1 = int(SimplicialComplex(simplices=graph['simplices']).betti_number(1))
+    betti2 = int(SimplicialComplex(simplices=graph['simplices']).betti_number(2))
+    data['betti'].append(betti0)
+    data['betti'].append(betti1)
+    data['betti'].append(betti2)
     return data
 
 def compute_cc(graph): 
@@ -541,7 +548,7 @@ def get_selected_data(selected_nodes):
     with open(APP_STATIC+"/uploads/cols_info.json") as f:
         cols_dict = json.load(f)
     cols = cols_dict['cols_numerical']
-    print(cols)
+    #print(cols)
     with open(APP_STATIC+"/uploads/nodes_detail.json") as f:
         nodes_detail = json.load(f)
     if len(selected_nodes) > 0:
@@ -609,6 +616,6 @@ def call_module_function(data, cols, module_info):
         conf_int_new = []
         for i in range(conf_int.shape[0]):
             conf_int_new.append(list(conf_int[i,:]))
-        print(result.summary())
+        #print(result.summary())
         data_new = jsonify(params=list(result.params), pvalues=list(result.pvalues), conf_int=conf_int_new, stderr=list(result.bse))
     return data_new
