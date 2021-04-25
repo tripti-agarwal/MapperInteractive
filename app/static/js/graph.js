@@ -969,6 +969,7 @@ class Graph{
                     // return d3.interpolateYlGnBu(Math.min(d.avgs[col_key]*1.5,1));
                 }
                 });
+        /*
         d3.selectAll(".viewer-graph__label")
             .attr("fill", d=>{
                 let circle_rgb = d3.select("#node"+d.id).attr("fill");
@@ -976,6 +977,7 @@ class Graph{
                 for (let i = 0; i < rgb.length; i++){ rgb[i] = (i === 3 ? 1 : 255) - rgb[i] };
                 return 'rgb(' + rgb.join(',') + ')';
             })
+        */
     }
 
     // unfill_vertex(){
