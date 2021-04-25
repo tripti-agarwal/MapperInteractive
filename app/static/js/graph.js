@@ -949,26 +949,24 @@ class Graph{
         d3.selectAll(".viewer-graph__pie").remove();
         d3.selectAll(".viewer-graph__vertex")
             .attr("fill", d=>{
-                if(d3.select("#node"+d.id).classed("selected")===false){
-                    if(col_key === "Number of points"){
-                        if(d.size < this.colorScale.domain()[0]){
-                            return "#fff"; // white
-                        } else if(d.size > this.colorScale.domain()[1]){
-                            return "rgb(169,169,169)"; // grey
-                        }
-                        return this.colorScale(d.size);
-                    } else if(col_key === "- None -"){
-                        return "#fff";
+                if(col_key === "Number of points"){
+                    if(d.size < this.colorScale.domain()[0]){
+                        return "#fff"; // white
+                    } else if(d.size > this.colorScale.domain()[1]){
+                        return "rgb(169,169,169)"; // grey
                     }
-                    else{
-                        // if(d.avgs[col_key] < this.colorScale.domain()[0]){
-                        //     return "rgb(255,255,255)"; // white
-                        // } else if(d.avgs[col_key] > this.colorScale.domain()[1]){
-                        //     return "rgb(169,169,169)"; // grey
-                        // }
-                        return this.colorScale(d.avgs[col_key]);
-                        // return d3.interpolateYlGnBu(Math.min(d.avgs[col_key]*1.5,1));
-                    }
+                    return this.colorScale(d.size);
+                } else if(col_key === "- None -"){
+                    return "#fff";
+                }
+                else{
+                    // if(d.avgs[col_key] < this.colorScale.domain()[0]){
+                    //     return "rgb(255,255,255)"; // white
+                    // } else if(d.avgs[col_key] > this.colorScale.domain()[1]){
+                    //     return "rgb(169,169,169)"; // grey
+                    // }
+                    return this.colorScale(d.avgs[col_key]);
+                    // return d3.interpolateYlGnBu(Math.min(d.avgs[col_key]*1.5,1));
                 }
                 });
         d3.selectAll(".viewer-graph__label")

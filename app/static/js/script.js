@@ -493,7 +493,8 @@ d3.select("#mapper_loader")
                     // possible to append
                     if(!(try_append && m == current_m)) {
                         for(let i=0; i<currently_selected.length; i++) {
-                            currently_selected[i].style.fill = '#fff';
+                            currently_selected[i].style.stroke = '#696969';
+                            currently_selected[i].style.strokeWidth = '2px';
                         }
                         currently_selected.length = 0; // clears the array
                     }
@@ -502,13 +503,15 @@ d3.select("#mapper_loader")
 
                     k_id = k.replace('_', '_node');
                     let el = document.getElementById(k_id);
-                    el.style.fill = '#4287f5';
+                    el.style.stroke = '#3277e5';
+                    el.style.strokeWidth = '5px';
                     currently_selected.push(el);
 
                     for(let i=0; i<res['links'][k].length; i++) {
                         let k2 = res['links'][k][i].replace('_', '_node');
                         let el = document.getElementById(k2);
-                        el.style.fill = '#96d9b9';
+                        el.style.stroke = '#86c9a9';
+                        el.style.strokeWidth = '5px';
                         currently_selected.push(el);
                     }
                 }
