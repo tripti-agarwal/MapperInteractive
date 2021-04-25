@@ -59,7 +59,15 @@ class Graph{
             .attr('x', 20)
             .attr('y', 20)
             .attr('font-weight', 'bold')
-            .text(n_intervals);
+            .text(n_intervals); 
+         //text for betti numbers
+         this.graphSvg.append("text")
+            .attr('width', 10)
+            .attr('height', 10)
+            .attr('x', 40)
+            .attr('y', 40)
+            .attr('font-weight', 'bold')
+            .text(graph_data['betti']);
         // this.COLORMAPS = [
         //     { 'label': '- None -', 'scheme': null },
         //     // { 'label': 'Rainbow', 'scheme': 'interpolateRainbow' },
