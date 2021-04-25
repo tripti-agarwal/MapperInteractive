@@ -515,11 +515,13 @@ d3.select("#mapper_loader")
 
                 for(let i=0; i<all_intervals.length; i++) {
                     //console.log('i', i);
+                    let prev_betti = i == 0 ? [] : res['mappers'][i-1].mapper.betti;
                     let graph = new Graph(res['mappers'][i].mapper, that.side_bar.all_cols,
                         res['mappers'][i].connected_components, that.side_bar.categorical_cols,
                         all_intervals[i],
                         that.side_bar.other_cols,
-                        click_callback);
+                        click_callback,
+                        prev_betti);
                     that.graphs.push(graph);
                     that.regression = new Regression(that.side_bar.all_cols);
                 }

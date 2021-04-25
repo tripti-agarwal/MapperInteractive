@@ -1,6 +1,6 @@
 class Graph{
     constructor(graph_data, col_keys, connected_components,categorical_cols,
-                n_intervals, other_cols=undefined, click_callback=undefined){
+                n_intervals, other_cols=undefined, click_callback=undefined, prev_betti=[]){
         this.n_intervals = n_intervals;
         this.viewer_id = "viewer-graph__graph";
         this.graphSvg_id = "graphSVG" + n_intervals;
@@ -52,22 +52,61 @@ class Graph{
         "Green, Blue":["green", "blue"]};
         this.colorScale = d3.scaleLinear();
 	 
-	// text for "which" interval
+        // text for "which" interval
         this.graphSvg.append("text")
             .attr('width', 10)
             .attr('height', 10)
             .attr('x', 20)
             .attr('y', 20)
             .attr('font-weight', 'bold')
-            .text(n_intervals); 
-         //text for betti numbers
-         this.graphSvg.append("text")
+            .text('int: ' + n_intervals); 
+
+        if(prev_betti.length == 0) {
+            prev_betti = graph_data['betti'];
+        }
+        //text for betti numbers
+        let is_b0_up = prev_betti[0] < graph_data['betti'][0];
+        let is_b1_up = prev_betti[1] < graph_data['betti'][1];
+        let is_b0_down = prev_betti[0] > graph_data['betti'][0];
+        let is_b1_down = prev_betti[1] > graph_data['betti'][1];
+
+        let b0_text = 'β₀: ' + graph_data['betti'][0];
+        let b1_text = 'β₁: ' + graph_data['betti'][1];
+        let b0_color = 'black';
+        let b1_color = 'black';
+        if(is_b0_up) {
+            b0_text += ' ↑';
+            b0_color = '#378f28';
+        }
+        if(is_b1_up) {
+            b1_text += ' ↑';
+            b1_color = '#378f28';
+        }
+        if(is_b0_down) {
+            b0_text += ' ↓';
+            b0_color = '#b53512';
+        }
+        if(is_b1_down) {
+            b1_text += ' ↓';
+            b1_color = '#b53512';
+        }
+
+        this.graphSvg.append("text")
             .attr('width', 10)
             .attr('height', 10)
-            .attr('x', 40)
+            .attr('x', 20)
             .attr('y', 40)
             .attr('font-weight', 'bold')
-            .text(graph_data['betti']);
+            .attr('fill', b0_color)
+            .text(b0_text);
+        this.graphSvg.append("text")
+            .attr('width', 10)
+            .attr('height', 10)
+            .attr('x', 20)
+            .attr('y', 60)
+            .attr('font-weight', 'bold')
+            .attr('fill', b1_color)
+            .text(b1_text);
         // this.COLORMAPS = [
         //     { 'label': '- None -', 'scheme': null },
         //     // { 'label': 'Rainbow', 'scheme': 'interpolateRainbow' },
