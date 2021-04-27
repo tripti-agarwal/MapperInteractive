@@ -376,6 +376,7 @@ d3.select("#load-raw-data")
 
 
 
+let dataset_filename = '';
 // Load Raw Data // 
 $("#import").click(function(){
     $("#files").click();
@@ -401,6 +402,7 @@ d3.select("#files")
         // d3.select(".columns-group")
         //     .style("max-height","1000px")
         //     .style("visibility", "visible");
+        dataset_filename = $('#files')[0].files[0].name;
         let files = $('#files')[0].files[0];
         let fileReader = new FileReader();
         fileReader.onload = function(fileLoadedEvent) {
@@ -528,6 +530,8 @@ d3.select("#mapper_loader")
                     that.graphs.push(graph);
                     that.regression = new Regression(that.side_bar.all_cols);
                 }
+
+                document.getElementById("main-title").innerText = 'Interactive Multiscale Mapper: ' + dataset_filename;
             });
         } else{
             alert("Please import a dataset frist!")
