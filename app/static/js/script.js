@@ -512,7 +512,7 @@ d3.select("#mapper_loader")
                     for(let i=0; i<res['links'][k].length; i++) {
                         let k2 = res['links'][k][i].replace('_', '_node');
                         let el = document.getElementById(k2);
-                        el.style.stroke = '#86c9a9';
+                        el.style.stroke = '#1f694f';
                         el.style.strokeWidth = '5px';
                         currently_selected.push(el);
                     }
