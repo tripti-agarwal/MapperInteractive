@@ -61,7 +61,7 @@ function draw_mapper_param_sliders(){
     //console.log("draw sliders")
     let intervals = [10, 20, 30, 40, 50];
     let overlaps = [0.25, 0.30, 0.35];
-    let numbers = [1, 2, 3, 4, 5, 6];
+    let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     let strides = [1, 2, 3, 4, 5, 6]
     let width = $(d3.select("#workspace-load_result").select(".block_body-inner").node()).width();
     let height = 30;
@@ -269,7 +269,7 @@ function draw_mapper_param_sliders(){
                             final_i = i;
                         }
                     })
-                    d3.select("#number_slider").attr("x", final_x+2);
+                    d3.select("#number_slider").attr("x", final_x+2+2);
                     d3.select("#mapper_number_label").html(parseInt(final_i));
                     this.dragStarted = false;
                 }));
