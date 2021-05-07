@@ -205,6 +205,7 @@ def get_multiscale_graph():
     # data = data[selected_cols].astype("float")
     config = mapper_data["config"]
     intervals = config['intervals']
+    number_of_intervals = len(intervals)
     norm_type = config["norm_type"]
     clustering_alg = config["clustering_alg"]
     clustering_alg_params = config["clustering_alg_params"]
@@ -259,6 +260,20 @@ def get_multiscale_graph():
             'mapper': mapper_result,
             'connected_components': connected_components
         })
+    G=[]
+    for number_of_mappers in range(0,number_of_intervals):
+          graph = nx.Graph()
+          print("number of nodes in mapper "+str(number_of_mappers)+"=",len(res[number_of_mappers]['mapper']['nodes']))
+          for ids in range(0,len(res[number_of_mappers]['mapper']['nodes'])):
+                id = int(res[number_of_mappers]['mapper']['nodes'][ids]['id'])
+                graph.add_node(id)
+          print("number of edges in mapper"+str(number_of_mappers)+"=",len(res[number_of_mappers]['mapper']['links']))
+          for edge in range(0, len(res[number_of_mappers]['mapper']['links'])):
+                source = int(res[number_of_mappers]['mapper']['links'][edge]['source'])
+                target = int(res[number_of_mappers]['mapper']['links'][edge]['target'])
+                graph.add_edge(source,target)
+          nx.write_gml(graph,'./app/saved_graphs/graph_'+str(number_of_mappers))
+          G.append(graph)
     
     # figure out links between mapper at different scales
     links = defaultdict(set)
